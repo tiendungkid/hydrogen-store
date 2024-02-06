@@ -22,6 +22,7 @@ import favicon from '../public/favicon.svg';
 import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
 import {Layout} from '~/components/Layout';
+import {Uppromote} from '@secomus/uppromote-hydrogen';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -123,6 +124,13 @@ export default function App() {
         <Layout {...data}>
           <Outlet />
         </Layout>
+        <Uppromote
+          cart={data.cart as any}
+          publicStoreDomain={'tiendungkid.myshopify.com'}
+          publicStorefrontApiToken={'c1e496586a75a93380a36d9dbcf4629a'}
+          publicStorefrontApiVersion={'2023-10'}
+          uppromoteAccessToken={''}
+        />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
         <LiveReload nonce={nonce} />
