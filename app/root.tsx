@@ -21,6 +21,7 @@ import {
 import favicon from '../public/favicon.svg';
 import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
+import customerReferral from '@secomus/uppromote-hydrogen/dist/styles/customer-referral.css';
 import {Layout} from '~/components/Layout';
 import {Uppromote} from '@secomus/uppromote-hydrogen';
 
@@ -48,6 +49,7 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 export function links() {
   return [
     {rel: 'stylesheet', href: resetStyles},
+    {rel: 'stylesheet', href: customerReferral},
     {rel: 'stylesheet', href: appStyles},
     {
       rel: 'preconnect',
