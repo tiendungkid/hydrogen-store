@@ -1,4 +1,4 @@
-import {useNonce} from '@shopify/hydrogen';
+import {useNonce, CartReturn} from '@shopify/hydrogen';
 import {
   defer,
   type SerializeFrom,
@@ -16,8 +16,8 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
+  Await,
 } from '@remix-run/react';
-import type {CustomerAccessToken} from '@shopify/hydrogen/storefront-api-types';
 import favicon from '../public/favicon.svg';
 import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
@@ -61,21 +61,19 @@ export function links() {
   ];
 }
 
+/**
+ * Access the result of the root loader from a React component.
+ */
 export const useRootLoaderData = () => {
   const [root] = useMatches();
   return root?.data as SerializeFrom<typeof loader>;
 };
 
 export async function loader({context}: LoaderFunctionArgs) {
-  const {storefront, session, cart} = context;
-  const customerAccessToken = await session.get('customerAccessToken');
+  const {storefront, customerAccount, cart} = context;
   const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
 
-  // validate the customer access token is valid
-  const {isLoggedIn, headers} = await validateCustomerAccessToken(
-    session,
-    customerAccessToken,
-  );
+  const isLoggedInPromise = customerAccount.isLoggedIn();
 
   // defer the cart query by not awaiting it
   const cartPromise = cart.get();
@@ -101,10 +99,14 @@ export async function loader({context}: LoaderFunctionArgs) {
       cart: cartPromise,
       footer: footerPromise,
       header: await headerPromise,
-      isLoggedIn,
+      isLoggedIn: isLoggedInPromise,
       publicStoreDomain,
     },
-    {headers},
+    {
+      headers: {
+        'Set-Cookie': await context.session.commit(),
+      },
+    },
   );
 }
 
@@ -124,16 +126,20 @@ export default function App() {
         <Layout {...data}>
           <Outlet />
         </Layout>
-        <Uppromote
-          cart={data.cart as any}
-          publicStoreDomain={'tiendungkid.myshopify.com'}
-          publicStorefrontApiToken={'c1e496586a75a93380a36d9dbcf4629a'}
-          publicStorefrontApiVersion={'2023-10'}
-          uppromoteAccessToken={''}
-        />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
         <LiveReload nonce={nonce} />
+        <Await resolve={data.cart}>
+          {(cart) => (
+            <Uppromote
+              publicStoreDomain="tiendungkid10"
+              publicStorefrontApiVersion="2024-01"
+              publicStorefrontApiToken="5253beb0ed9bd86cbe7d8755f5d5106f"
+              uppromoteAccessToken=""
+              cart={cart}
+            />
+          )}
+        </Await>
       </body>
     </html>
   );
@@ -179,42 +185,6 @@ export function ErrorBoundary() {
       </body>
     </html>
   );
-}
-
-/**
- * Validates the customer access token and returns a boolean and headers
- * @see https://shopify.dev/docs/api/storefront/latest/objects/CustomerAccessToken
- *
- * @example
- * ```js
- * const {isLoggedIn, headers} = await validateCustomerAccessToken(
- *  customerAccessToken,
- *  session,
- * );
- * ```
- */
-async function validateCustomerAccessToken(
-  session: LoaderFunctionArgs['context']['session'],
-  customerAccessToken?: CustomerAccessToken,
-) {
-  let isLoggedIn = false;
-  const headers = new Headers();
-  if (!customerAccessToken?.accessToken || !customerAccessToken?.expiresAt) {
-    return {isLoggedIn, headers};
-  }
-
-  const expiresAt = new Date(customerAccessToken.expiresAt).getTime();
-  const dateNow = Date.now();
-  const customerAccessTokenExpired = expiresAt < dateNow;
-
-  if (customerAccessTokenExpired) {
-    session.unset('customerAccessToken');
-    headers.append('Set-Cookie', await session.commit());
-  } else {
-    isLoggedIn = true;
-  }
-
-  return {isLoggedIn, headers};
 }
 
 const MENU_FRAGMENT = `#graphql

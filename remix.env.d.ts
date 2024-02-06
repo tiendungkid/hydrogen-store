@@ -5,13 +5,12 @@
 // Enhance TypeScript's built-in typings.
 import '@total-typescript/ts-reset';
 
-import type {Storefront, HydrogenCart} from '@shopify/hydrogen';
+import type {Storefront, CustomerClient, HydrogenCart} from '@shopify/hydrogen';
 import type {
   LanguageCode,
   CountryCode,
 } from '@shopify/hydrogen/storefront-api-types';
-import type {CustomerAccessToken} from '@shopify/hydrogen/storefront-api-types';
-import type {HydrogenSession} from './server';
+import type {AppSession} from '~/lib/session';
 
 declare global {
   /**
@@ -50,14 +49,8 @@ declare module '@shopify/remix-oxygen' {
     env: Env;
     cart: HydrogenCart;
     storefront: Storefront<I18nLocale>;
-    session: HydrogenSession;
+    customerAccount: CustomerClient;
+    session: AppSession;
     waitUntil: ExecutionContext['waitUntil'];
-  }
-
-  /**
-   * Declare the data we expect to access via `context.session`.
-   */
-  export interface SessionData {
-    customerAccessToken: CustomerAccessToken;
   }
 }
