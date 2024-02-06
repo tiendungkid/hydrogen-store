@@ -137,7 +137,6 @@ export default function App() {
               publicStoreDomain="tiendungkid10"
               publicStorefrontApiVersion="2024-01"
               publicStorefrontApiToken="5253beb0ed9bd86cbe7d8755f5d5106f"
-              uppromoteAccessToken=""
               cart={cart}
             />
           )}
