@@ -15,7 +15,7 @@
   "dependencies": {
     "@remix-run/react": "^2.5.1",
     "@remix-run/server-runtime": "^2.5.1",
-    "@secomus/uppromote-hydrogen": "^0.0.8",
+    "@secomus/uppromote-hydrogen": "^0.0.9",
     "@shopify/cli": "3.52.0",
     "@shopify/cli-hydrogen": "^7.0.0",
     "@shopify/hydrogen": "~2024.1.0",
